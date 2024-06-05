@@ -5,6 +5,7 @@ import { UserModule } from './user/user.module';
 import { TransactionPartyModule } from './transaction-party/transaction-party.module';
 import { DatabaseModule } from './database/database.module';
 import { NotificationModule } from './notification/notification.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   providers: [AppService],
@@ -14,6 +15,9 @@ import { NotificationModule } from './notification/notification.module';
     TransactionPartyModule,
     DatabaseModule,
     NotificationModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
   ],
 })
 export class AppModule {}

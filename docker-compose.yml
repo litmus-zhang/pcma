@@ -1,0 +1,30 @@
+version: '3.1'
+
+services:
+  testDB:
+    image: postgres:15
+    container_name: testDB
+    ports:
+      - "1000:5432"
+    environment:
+      - POSTGRES_USER=test
+      - POSTGRES_PASSWORD=test
+      - POSTGRES_DB=test
+    volumes:
+      - ./testDB:/var/lib/postgresql/data
+  mainDB:
+    image: postgres:15
+    container_name: mainDB
+    ports:
+      - "1001:5432"
+    environment:
+      - POSTGRES_USER=main
+      - POSTGRES_PASSWORD=main
+      - POSTGRES_DB=main
+    volumes:
+      - ./mainDB:/var/lib/postgresql/data
+
+
+volumes:
+  testDB:
+  mainDB:
