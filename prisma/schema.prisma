@@ -19,35 +19,47 @@ model User {
   firstname          String?
   lastname           String?
   password           String?
-  secret_pii         secret_pii[]
-  basic_pii          basic_pii[]
-  TransactionParty   TransactionParty? @relation(fields: [transactionPartyId], references: [id])
-  transactionPartyId Int?
+  pii                personal_id?
+  transactionParties UserTransactionParty[]
 }
 
 model TransactionParty {
   id    Int    @id @default(autoincrement())
   name  String
   email String
-  users User[]
+  users UserTransactionParty[]
 }
 
-model ersonal_id {
-  id      Int @id @default(autoincrement())
-  user_id Int
+model UserTransactionParty {
+  userId           Int
+  user             User             @relation(fields: [userId], references: [id])
+  transactionPartyId Int
+  transactionParty TransactionParty @relation(fields: [transactionPartyId], references: [id])
+
+  @@id([userId, transactionPartyId])
+}
+
+model personal_id {
+  id                Int         @id @default(autoincrement())
+  user_id           Int         @unique
+  user              User        @relation(fields: [user_id], references: [id])
+  basicPII          basic_pii?  @relation(fields: [basic_piiUser_id], references: [user_id])
+  secretPII         secret_pii? @relation(fields: [secret_piiUser_id], references: [user_id])
+  basic_piiUser_id  Int?
+  secret_piiUser_id Int?
 }
 
 model basic_pii {
-  user_id   Int     @id
-  user      User    @relation(fields: [user_id], references: [id])
-  firstname String?
-  lastname  String?
-  email     String?
+  user_id     Int           @id
+  firstname   String?
+  lastname    String?
+  email       String?
+  personal_id personal_id[]
 }
 
 model secret_pii {
-  user_id Int     @id
-  user    User    @relation(fields: [user_id], references: [id])
-  ssn     String?
-  address String?
+  user_id     Int           @id
+  ssn         String?
+  address     String?
+  personal_id personal_id[]
 }

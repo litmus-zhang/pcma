@@ -3,5 +3,7 @@ import { TransactionPartyService } from './transaction-party.service';
 
 @Controller('transaction-party')
 export class TransactionPartyController {
-  constructor(private readonly transactionPartyService: TransactionPartyService) {}
+  constructor(
+    private readonly transactionPartyService: TransactionPartyService,
+  ) {}
 }

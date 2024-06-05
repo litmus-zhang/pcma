@@ -1,14 +1,13 @@
 import { Module } from '@nestjs/common';
-import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { TransactionPartyModule } from './transaction-party/transaction-party.module';
 import { DatabaseModule } from './database/database.module';
 import { NotificationModule } from './notification/notification.module';
 import { ConfigModule } from '@nestjs/config';
+import { AppController } from './app.controller';
 
 @Module({
-  providers: [AppService],
   imports: [
     AuthModule,
     UserModule,
@@ -19,5 +18,6 @@ import { ConfigModule } from '@nestjs/config';
       isGlobal: true,
     }),
   ],
+  controllers: [AppController],
 })
 export class AppModule {}
