@@ -1,7 +1,7 @@
 import { IsEmail, IsNotEmpty, IsStrongPassword } from 'class-validator';
 import { IsSameValueAs } from './IsSameValue';
 
-export class RegisterDto {
+export class UserRegisterDto {
   @IsNotEmpty()
   @IsEmail()
   email: string;

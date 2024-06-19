@@ -7,7 +7,11 @@ import {
 import { AppModule } from './../src/app.module';
 import * as pactum from 'pactum';
 import { DatabaseService } from '../src/database/database.service';
-import { RegisterDto } from 'src/auth/dto';
+import {
+  CompanyRegisterDto,
+  UserLoginDto,
+  UserRegisterDto,
+} from 'src/auth/dto';
 
 describe('PCMA (e2e) testing', () => {
   let app: INestApplication;
@@ -53,31 +57,32 @@ describe('PCMA (e2e) testing', () => {
   describe('Authentication Module', () => {
     describe('User Authentication', () => {
       describe('User signup', () => {
-        const registerDto: RegisterDto = {
+        const registerDto: UserRegisterDto = {
           email: 'sample@test.com',
           password: 'Password@1',
           confirmPassword: 'Password@1',
           firstName: 'John',
           lastName: 'Doe',
         };
+
         it('should return error if email is not provided', () => {
           return pactum
             .spec()
-            .post('/auth/signup')
+            .post('/auth/user/signup')
             .withJson({ ...registerDto, email: '' })
             .expectStatus(400);
         });
         it('should return error if password is not provided', () => {
           return pactum
             .spec()
-            .post('/auth/signup')
+            .post('/auth/user/signup')
             .withJson({ ...registerDto, password: '' })
             .expectStatus(400);
         });
         it('should return error and message if password and confirmPassword is not the same', () => {
           return pactum
             .spec()
-            .post('/auth/signup')
+            .post('/auth/user/signup')
             .withJson({ ...registerDto, password: 'Password' })
             .expectStatus(400)
             .expectBodyContains('confirmPassword must match password');
@@ -85,31 +90,115 @@ describe('PCMA (e2e) testing', () => {
         it('should return error if firstname is not provided', () => {
           return pactum
             .spec()
-            .post('/auth/signup')
+            .post('/auth/user/signup')
             .withJson({ ...registerDto, firstName: '' })
             .expectStatus(400);
         });
         it('should return error if lastname is not provided', () => {
           return pactum
             .spec()
-            .post('/auth/signup')
+            .post('/auth/user/signup')
             .withJson({ ...registerDto, lastName: '' })
             .expectStatus(400);
         });
         it('should return error if no body is not provided', () => {
-          return pactum.spec().post('/auth/signup').expectStatus(400);
+          return pactum.spec().post('/auth/user/signup').expectStatus(400);
         });
         it('should return success message and status OK if all data is provided', () => {
           return pactum
             .spec()
-            .post('/auth/signup')
+            .post('/auth/user/signup')
             .withJson(registerDto)
             .expectStatus(201)
             .expectJson({ message: 'User registered successfully' });
         });
       });
+      describe('User Login', () => {
+        const loginDto: UserLoginDto = {
+          email: 'sample@test.com',
+          password: 'Password@1',
+        };
+        it('should return error if email is not provided', () => {
+          return pactum
+            .spec()
+            .post('/auth/user/login')
+            .withJson({ ...loginDto, email: '' })
+            .expectStatus(400);
+        });
+        it('should return error if password is not provided', () => {
+          return pactum
+            .spec()
+            .post('/auth/user/login')
+            .withJson({ ...loginDto, password: '' })
+            .expectStatus(400);
+        });
+        it('should return error if no body is not provided', () => {
+          return pactum.spec().post('/auth/user/login').expectStatus(400);
+        });
+        it('should return success message and status OK if all data is provided', () => {
+          return pactum
+            .spec()
+            .post('/auth/user/login')
+            .withJson(loginDto)
+            .expectStatus(201)
+            .expectBodyContains('User login successfully')
+            .stores('token', 'body.token');
+        });
+      });
     });
-    describe('Transaction Party Authentication', () => {});
+    describe('Transaction Party Authentication', () => {
+      const registerDto: CompanyRegisterDto = {
+        email: 'sample@test.com',
+        password: 'Password@1',
+        confirmPassword: 'Password@1',
+        companyName: 'John Snow LLC',
+      };
+      describe('Transaction Party signup', () => {
+        it('should return error if email is not provided', () => {
+          return pactum
+            .spec()
+            .post('/auth/tp/signup')
+            .withJson({ ...registerDto, email: '' })
+            .expectStatus(400);
+        });
+        it.todo('should not allow generic mail like @gmail.com or @yahoo.com');
+        it('should throw error when a field(company name) is not provided', () => {
+          return pactum
+            .spec()
+            .post('/auth/tp/signup')
+            .withJson({ ...registerDto, companyName: '' })
+            .expectStatus(400);
+        });
+      });
+      describe('Transaction Party login', () => {
+        const loginDto: UserLoginDto = {
+          email: 'sample@test.com',
+          password: 'Password@1',
+        };
+        it('should return error if email is not provided', () => {
+          return pactum
+            .spec()
+            .post('/auth/tp/login')
+            .withJson({ ...loginDto, email: '' })
+            .expectStatus(400);
+        });
+        it('should throw error when a field is not provided', () => {
+          return pactum
+            .spec()
+            .post('/auth/tp/login')
+            .withJson({ loginDto, password: '' })
+            .expectStatus(400);
+        });
+        it('should return success message and status OK if all data is provided', () => {
+          return pactum
+            .spec()
+            .post('/auth/tp/login')
+            .withJson(loginDto)
+            .expectStatus(201)
+            .expectBodyContains('Company login successfully');
+        });
+      });
+    });
   });
   describe('User-Transaction party interaction', () => {
     describe('user signup on transaction party using the PCMA provider', () => {});
