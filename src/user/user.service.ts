@@ -1,6 +1,6 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { UserRegisterDto } from 'src/auth/dto';
-import { DatabaseService } from 'src/database/database.service';
+import { DatabaseService } from '../database/database.service';
 
 @Injectable()
 export class UserService {

@@ -1,7 +1,7 @@
 import { HttpStatus } from '@nestjs/common';
 
 export interface ResponseStatus {
-  status: HttpStatus;
+  status?: HttpStatus;
   message: string;
   data?: any;
 }

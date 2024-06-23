@@ -142,7 +142,7 @@ describe('PCMA (e2e) testing', () => {
             .withJson(loginDto)
             .expectStatus(201)
             .expectBodyContains('User login successfully')
-            .stores('token', 'body.token');
+            .stores('userAt', 'token.access_token');
         });
       });
     });
@@ -169,6 +169,14 @@ describe('PCMA (e2e) testing', () => {
             .withJson({ ...registerDto, companyName: '' })
             .expectStatus(400);
         });
+        it('should return success message and status OK if all data is provided', () => {
+          return pactum
+            .spec()
+            .post('/auth/tp/signup')
+            .withJson(registerDto)
+            .expectStatus(201)
+            .expectBodyContains('Company registered successfully');
+        });
       });
       describe('Transaction Party login', () => {
         const loginDto: UserLoginDto = {
@@ -186,7 +194,7 @@ describe('PCMA (e2e) testing', () => {
           return pactum
             .spec()
             .post('/auth/tp/login')
-            .withJson({ loginDto, password: '' })
+            .withJson({ ...loginDto, password: '' })
             .expectStatus(400);
         });
         it('should return success message and status OK if all data is provided', () => {
@@ -195,8 +203,37 @@ describe('PCMA (e2e) testing', () => {
             .post('/auth/tp/login')
             .withJson(loginDto)
             .expectStatus(201)
-            .expectBodyContains('Company login successfully');
+            .expectBodyContains('Company login successfully')
+            .stores('tpAt', 'token.access_token');
         });
+      });
+    });
+  });
+  describe('User Module', () => {
+    describe('User Profile', () => {
+      it('should return error if user is not authenticated', () => {
+        return pactum.spec().get('/user/profile').expectStatus(401);
+      });
+      it('should return user profile', () => {
+        return pactum
+          .spec()
+          .get('/user/profile')
+          .withHeaders({ Authorization: 'Bearer $S{userAt}' })
+          .expectStatus(200);
+      });
+    });
+  });
+  describe('Transaction Party Module', () => {
+    describe('Transaction Party Profile', () => {
+      it('should return error if company is not authenticated', () => {
+        return pactum.spec().get('/tp/profile').expectStatus(401);
+      });
+      it('should return company profile', () => {
+        return pactum
+          .spec()
+          .get('/tp/profile')
+          .withHeaders({ Authorization: 'Bearer $S{tpAt}' })
+          .expectStatus(200);
       });
     });
   });

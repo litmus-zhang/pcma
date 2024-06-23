@@ -1,12 +1,13 @@
 import { Body, Controller, Get, Patch, UseGuards } from '@nestjs/common';
 import { TransactionPartyService } from './transaction-party.service';
-import { GetUser } from 'src/auth/decorators';
+import { GetUser } from '../auth/decorators';
 import { TransactionParty } from '@prisma/client';
-import { CompanyRegisterDto } from 'src/auth/dto';
-import { JwtGuard } from 'src/auth/guards';
+import { CompanyRegisterDto } from '../auth/dto';
+import { JwtGuard } from '../auth/guards';
+// import { ResponseStatus } from 'src/types/response.status';
 
 @UseGuards(JwtGuard)
-@Controller('transaction-party')
+@Controller('tp')
 export class TransactionPartyController {
   constructor(
     private readonly transactionPartyService: TransactionPartyService,
@@ -14,6 +15,7 @@ export class TransactionPartyController {
 
   @Get('profile')
   async getMe(@GetUser() transactionParty: TransactionParty) {
+    console.log('transactionParty', transactionParty);
     return transactionParty;
   }
   @Patch('profile')

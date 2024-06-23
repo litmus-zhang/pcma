@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
-import { DatabaseService } from 'src/database/database.service';
+import { DatabaseService } from '../../database/database.service';
 import { Strategy, ExtractJwt } from 'passport-jwt';
 
 @Injectable()
@@ -20,6 +20,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     const user = await this.database.user.findUnique({
       where: { id: payload.sub },
     });
+    if (!user) return null;
     delete user.password;
 
     return user;
