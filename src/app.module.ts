@@ -8,6 +8,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { JwtModule } from '@nestjs/jwt';
 //import { DevtoolsModule } from '@nestjs/devtools-integration';
+import { CrawlerModule } from './crawler/crawler.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { JwtModule } from '@nestjs/jwt';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    CrawlerModule,
     // DevtoolsModule.register({
     //   http: process.env.NODE_ENV !== 'production',
     //   // port: 3002,

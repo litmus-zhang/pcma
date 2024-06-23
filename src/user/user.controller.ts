@@ -24,4 +24,9 @@ export class UserController {
   async updateMe(@GetUser('id') userId: number, @Body() dto: UserRegisterDto) {
     return this.userService.editMe(userId, dto);
   }
+
+  @Get('all-data-leaks')
+  async getAllDataLeaks(@GetUser('id') userId: number) {
+    return this.userService.getAllDataLeaks(userId);
+  }
 }
