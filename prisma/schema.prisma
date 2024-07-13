@@ -14,28 +14,31 @@ datasource db {
 }
 
 model User {
-  id                 Int               @id @default(autoincrement())
-  email              String            @unique
+  id                 Int                    @id @default(autoincrement())
+  email              String                 @unique
   firstname          String?
   lastname           String?
   password           String?
   pii                personal_id?
   transactionParties UserTransactionParty[]
+  user_tp_request    user_tp_request[]
 }
 
 model TransactionParty {
-  id    Int    @id @default(autoincrement())
-  name  String
-  email String
-  password String
-  users UserTransactionParty[]
+  id              Int                    @id @default(autoincrement())
+  name            String
+  email           String
+  password        String
+  users           UserTransactionParty[]
+  user_tp_request user_tp_request[]
+  application     application[]
 }
 
 model UserTransactionParty {
-  userId           Int
-  user             User             @relation(fields: [userId], references: [id])
+  userId             Int
+  user               User             @relation(fields: [userId], references: [id])
   transactionPartyId Int
-  transactionParty TransactionParty @relation(fields: [transactionPartyId], references: [id])
+  transactionParty   TransactionParty @relation(fields: [transactionPartyId], references: [id])
 
   @@id([userId, transactionPartyId])
 }
@@ -56,11 +59,43 @@ model basic_pii {
   lastname    String?
   email       String?
   personal_id personal_id[]
+  secret_pii  secret_pii[]
 }
 
 model secret_pii {
-  user_id     Int           @id
-  ssn         String?
-  address     String?
-  personal_id personal_id[]
+  user_id           Int           @id
+  dateOfBirth       String?
+  homeAddress       String?
+  country           String?
+  occupation        String?
+  phoneNumber       String?
+  basic_pii_User_id Int
+  basic_pii         basic_pii?    @relation(fields: [basic_pii_User_id], references: [user_id])
+  personal_id       personal_id[]
+}
+
+model user_tp_request {
+  id                 Int              @id @default(autoincrement())
+  user_id            Int
+  user               User             @relation(fields: [user_id], references: [id])
+  transactionPartyId Int
+  transactionParty   TransactionParty @relation(fields: [transactionPartyId], references: [id])
+  status             String           @default("pending")
+  activity           String?
+  createdAt          DateTime
+  updatedAt          DateTime
+}
+
+model application {
+  id               Int              @id @default(autoincrement())
+  name             String
+  website_url      String
+  logo_url         String
+  createdBy        Int
+  transactionParty TransactionParty @relation(fields: [createdBy], references: [id])
+  createdAt        DateTime
+  updatedAt        DateTime
+  data_access      String[]
+  secret_key       String
+  public_key       String
 }

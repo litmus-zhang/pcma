@@ -1,8 +1,8 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { UserRegisterDto } from 'src/auth/dto';
 import { DatabaseService } from '../database/database.service';
 import { ResponseStatus } from 'src/types/response.status';
-import { CrawlerService } from 'src/crawler/crawler.service';
+import { CrawlerService } from '../crawler/crawler.service';
+import { UserBasicPiiDto, UserSensitivePiiDto, UserUpdateDto } from './dto';
 
 @Injectable()
 export class UserService {
@@ -10,7 +10,7 @@ export class UserService {
     private database: DatabaseService,
     private crawler: CrawlerService,
   ) {}
-  async editMe(userId: number, data: UserRegisterDto) {
+  async editMe(userId: number, data: UserUpdateDto): Promise<ResponseStatus> {
     try {
       const result = await this.database.user.update({
         where: { id: userId },
@@ -28,6 +28,104 @@ export class UserService {
         status: HttpStatus.BAD_REQUEST,
       };
     }
+  }
+  async setBasicPII(
+    userId: number,
+    data: UserBasicPiiDto,
+  ): Promise<ResponseStatus> {
+    try {
+      const result = await this.database.basic_pii.create({
+        data: {
+          user_id: userId,
+          firstname: data.firstName,
+          lastname: data.lastName,
+          email: data.email,
+        },
+      });
+      return {
+        message: 'User Basic PII updated successfully',
+        data: result,
+        status: HttpStatus.CREATED,
+      };
+    } catch (error) {
+      return {
+        message: error.message,
+        status: HttpStatus.BAD_REQUEST,
+      };
+    }
+  }
+  async setSensitivePII(
+    userId: number,
+    data: UserSensitivePiiDto,
+  ): Promise<ResponseStatus> {
+    try {
+      const result = await this.database.secret_pii.create({
+        data: {
+          user_id: userId,
+          country: data.country || 'Nigeria',
+          dateOfBirth: String(data.dateOfBirth),
+          homeAddress: data.homeAddress,
+          occupation: data.occupation,
+          phoneNumber: data.phoneNumber,
+          basic_pii_User_id: userId,
+        },
+      });
+      return {
+        message: 'User Personal PII updated successfully',
+        data: result,
+        status: HttpStatus.CREATED,
+      };
+    } catch (error) {
+      return {
+        message: error.message,
+        status: HttpStatus.BAD_REQUEST,
+      };
+    }
+  }
+
+  async getDashboard(userId: number): Promise<ResponseStatus> {
+    try {
+      const data = await this.database.user_tp_request.findMany({
+        where: {
+          id: userId,
+        },
+      });
+      const result = await this.sortDashboardData(data);
+      return {
+        message: 'User dashboard data fetched successfully',
+        data: result,
+        status: HttpStatus.OK,
+      };
+    } catch (error) {
+      return {
+        message: error.message,
+        status: HttpStatus.BAD_REQUEST,
+      };
+    }
+  }
+  async sortDashboardData(data: any): Promise<any> {
+    // get all request count by type
+    // get all request count by status
+    // get all request
+    const requestStatusCount = data.reduce((acc, curr) => {
+      if (!acc[curr.status]) {
+        acc[curr.status] = 0;
+      }
+      acc[curr.status]++;
+      return acc;
+    }, {});
+    return {
+      request: {
+        pending: requestStatusCount['pending'] || 0,
+        approved: requestStatusCount['approved'] || 0,
+        revoked: requestStatusCount['revoked'] || 0,
+        data_leaks: requestStatusCount['data_leaks'] || 0,
+      },
+      activities: {
+        total: data.length,
+        data: data,
+      },
+    };
   }
   async getAllDataLeaks(userId: number): Promise<ResponseStatus> {
     const user = await this.database.user.findUnique({

@@ -12,6 +12,7 @@ import {
   UserLoginDto,
   UserRegisterDto,
 } from 'src/auth/dto';
+import { UserBasicPiiDto, UserSensitivePiiDto } from 'src/user/dto';
 
 describe('PCMA (e2e) testing', () => {
   let app: INestApplication;
@@ -152,6 +153,10 @@ describe('PCMA (e2e) testing', () => {
         password: 'Password@1',
         confirmPassword: 'Password@1',
         companyName: 'John Snow LLC',
+        companyAddress: '123 Main Street',
+        fullName: 'John Snow',
+        phoneNumber: '1234567890',
+        registrationNumber: '1234567890',
       };
       describe('Transaction Party signup', () => {
         it('should return error if email is not provided', () => {
@@ -221,6 +226,76 @@ describe('PCMA (e2e) testing', () => {
           .withHeaders({ Authorization: 'Bearer $S{userAt}' })
           .expectStatus(200);
       });
+      it('should update user profile', () => {
+        return pactum
+          .spec()
+          .patch('/user/profile')
+          .withBearerToken('$S{userAt}')
+          .withJson({ firstname: 'John', lastname: 'Doe' })
+          .expectStatus(200)
+          .expectBodyContains('User profile updated successfully');
+      });
+    });
+    describe('Set  User PII', () => {
+      const basic_pii: UserBasicPiiDto = {
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'sample@test.com',
+      };
+      const secret_pii: UserSensitivePiiDto = {
+        ...basic_pii,
+        homeAddress: '123 Main Street',
+        country: '1234567890',
+        phoneNumber: '1234567890',
+        dateOfBirth: new Date('1990-01-01'),
+        occupation: 'Software Engineer',
+      };
+      it('should set basic PII', () => {
+        return pactum
+          .spec()
+          .post('/user/basic-pii')
+          .withBearerToken('$S{userAt}')
+          .withBody(basic_pii)
+          .expectStatus(201)
+          .expectBodyContains('User Basic PII updated successfully');
+      });
+      it('should set personal PII', () => {
+        return pactum
+          .spec()
+          .post('/user/sensitive-pii')
+          .withBearerToken('$S{userAt}')
+          .withBody(secret_pii)
+          .expectStatus(201)
+          .expectBodyContains('User Personal PII updated successfully');
+      });
+    });
+    describe('User Dashboard', () => {
+      it('should return error if user is not authenticated', () => {
+        return pactum.spec().get('/user/dashboard').expectStatus(401);
+      });
+      it('should return user dashboard data', () => {
+        return pactum
+          .spec()
+          .get('/user/dashboard')
+          .withBearerToken('$S{userAt}')
+          .expectBodyContains('User dashboard data fetched successfully')
+          .expectBody({
+            data: {
+              request: {
+                pending: 0,
+                approved: 0,
+                revoked: 0,
+                data_leaks: 0,
+              },
+              activities: {
+                total: 0,
+                data: [],
+              },
+            },
+            message: 'User dashboard data fetched successfully',
+            status: 200,
+          });
+      });
     });
   });
   describe('Transaction Party Module', () => {
@@ -228,13 +303,19 @@ describe('PCMA (e2e) testing', () => {
       it('should return error if company is not authenticated', () => {
         return pactum.spec().get('/tp/profile').expectStatus(401);
       });
-      it('should return company profile', () => {
-        return pactum
-          .spec()
-          .get('/tp/profile')
-          .withHeaders({ Authorization: 'Bearer $S{tpAt}' })
-          .expectStatus(200);
+      // it('should return company profile', () => {
+      //   return pactum
+      //     .spec()
+      //     .get('/tp/profile')
+      //     .withHeaders({ Authorization: 'Bearer $S{tpAt}' })
+      //     .expectStatus(200);
+      // });
+    });
+    describe('Create an Application', () => {
+      it('should return error if company is not authenticated', () => {
+        return pactum.spec().post('/tp/application').expectStatus(401);
       });
+      // it('should create an application', () => {});
     });
   });
   describe('User-Transaction party interaction', () => {

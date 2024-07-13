@@ -26,7 +26,7 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "pretest:e2e": "yarn db:test:restart && sleep 3 && yarn prisma db push --schema=./prisma/schema.prisma",
+    "pretest:e2e": "yarn db:test:restart",
     "test:e2e": "dotenv -e .env.test -- jest --watch --no-cache --config ./test/jest-e2e.json"
   },
   "dependencies": {
@@ -38,6 +38,7 @@
     "@nestjs/mapped-types": "*",
     "@nestjs/passport": "^10.0.3",
     "@nestjs/platform-express": "^10.0.0",
+    "@nestjs/swagger": "^7.4.0",
     "@novu/node": "^0.24.2",
     "@prisma/client": "^5.15.0",
     "argon2": "^0.40.3",
@@ -47,7 +48,8 @@
     "passport-jwt": "^4.0.1",
     "puppeteer": "^22.12.0",
     "reflect-metadata": "^0.2.0",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",
