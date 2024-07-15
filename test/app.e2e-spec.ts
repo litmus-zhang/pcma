@@ -145,6 +145,20 @@ describe('PCMA (e2e) testing', () => {
             .expectBodyContains('User login successfully')
             .stores('userAt', 'token.access_token');
         });
+        it('should return access and refresh token if all data is provided', () => {
+          return pactum
+            .spec()
+            .post('/auth/user/login')
+            .withJson(loginDto)
+            .expectStatus(201)
+            .expectJsonLike({
+              token: {
+                access_token: /.+/,
+                refresh_token: /.+/,
+              },
+            })
+            .inspect();
+        });
       });
     });
     describe('Transaction Party Authentication', () => {

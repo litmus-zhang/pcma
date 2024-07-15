@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Request } from '@nestjs/common';
 import { CompanyRegisterDto, UserLoginDto, UserRegisterDto } from './dto';
 import { DatabaseService } from '../database/database.service';
 import { JwtService } from '@nestjs/jwt';
@@ -110,14 +110,26 @@ export class AuthService {
   async signToken(
     userId: number,
     email: string,
-  ): Promise<{ access_token: string }> {
+  ): Promise<{ access_token: string; refresh_token: string }> {
     const payload = { sub: userId, email };
-    const token = await this.jwt.signAsync(payload, {
+    const access_token = await this.jwt.signAsync(payload, {
       expiresIn: '30m',
-      secret: this.config.get('JWT_SECRET'),
+      secret: this.config.get('ACCESS_JWT_SECRET'),
+    });
+    const refresh_token = await this.jwt.signAsync(payload, {
+      expiresIn: '7d',
+      secret: this.config.get('REFRESH_JWT_SECRET'),
     });
     return {
-      access_token: token,
+      access_token,
+      refresh_token,
     };
+  }
+  async refreshToken(req: Request) {
+    const token = req.headers.get('Authorization').split(' ')[1];
+    const payload = await this.jwt.verifyAsync(token, {
+      secret: this.config.get('REFRESH_JWT_SECRET'),
+    });
+    return await this.signToken(payload.sub, payload.email);
   }
 }
