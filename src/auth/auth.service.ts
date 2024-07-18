@@ -1,5 +1,10 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { CompanyRegisterDto, UserLoginDto, UserRegisterDto } from './dto';
+import {
+  CompanyRegisterDto,
+  RefreshTokenDto,
+  UserLoginDto,
+  UserRegisterDto,
+} from './dto';
 import { DatabaseService } from '../database/database.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -128,7 +133,7 @@ export class AuthService {
       refresh_token,
     };
   }
-  async refreshToken(token: { refresh_token: string }) {
+  async refreshToken(token: RefreshTokenDto) {
     try {
       const { refresh_token } = token;
       const payload = await this.jwt.verifyAsync(String(refresh_token), {
