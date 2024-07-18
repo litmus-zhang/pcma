@@ -5,3 +5,9 @@ export interface ResponseStatus {
   message: string;
   data?: any;
 }
+
+export enum UserRole {
+  ADMIN = 'admin',
+  USER = 'user',
+  TRANSACTION_PARTY = 'transaction_party',
+}

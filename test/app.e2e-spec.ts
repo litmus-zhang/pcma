@@ -157,6 +157,17 @@ describe('PCMA (e2e) testing', () => {
                 refresh_token: /.+/,
               },
             })
+            .stores('userRt', 'token.refresh_token');
+        });
+        it('should return user role if all data is provided', () => {
+          return pactum
+            .spec()
+            .post('/auth/user/login')
+            .withJson(loginDto)
+            .expectStatus(201)
+            .expectJsonLike({
+              role: 'user',
+            })
             .inspect();
         });
       });
@@ -225,6 +236,16 @@ describe('PCMA (e2e) testing', () => {
             .expectBodyContains('Company login successfully')
             .stores('tpAt', 'token.access_token');
         });
+        it('should return role ', () => {
+          return pactum
+            .spec()
+            .post('/auth/tp/login')
+            .withJson(loginDto)
+            .expectStatus(201)
+            .expectJsonLike({
+              role: 'transaction_party',
+            });
+        });
       });
     });
   });
@@ -248,6 +269,20 @@ describe('PCMA (e2e) testing', () => {
           .withJson({ firstname: 'John', lastname: 'Doe' })
           .expectStatus(200)
           .expectBodyContains('User profile updated successfully');
+      });
+      it('should update access token', () => {
+        return pactum
+          .spec()
+          .post('/auth/token/refresh')
+          .withBearerToken('$S{userAt}')
+          .withBody({
+            refresh_token: '$S{userRt}',
+          })
+          .expectStatus(201)
+          .expectJsonLike({
+            access_token: /.+/,
+            refresh_token: /.+/,
+          });
       });
     });
     describe('Set  User PII', () => {

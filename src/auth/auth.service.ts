@@ -1,9 +1,10 @@
-import { BadRequestException, Injectable, Request } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CompanyRegisterDto, UserLoginDto, UserRegisterDto } from './dto';
 import { DatabaseService } from '../database/database.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as argon from 'argon2';
+import { UserRole } from '../types/response.status';
 
 @Injectable()
 export class AuthService {
@@ -84,6 +85,7 @@ export class AuthService {
     return {
       message: 'User login successfully',
       token,
+      role: UserRole.USER,
     };
   }
 
@@ -104,6 +106,7 @@ export class AuthService {
     return {
       message: 'Company login successfully',
       token,
+      role: UserRole.TRANSACTION_PARTY,
     };
   }
 
@@ -125,11 +128,15 @@ export class AuthService {
       refresh_token,
     };
   }
-  async refreshToken(req: Request) {
-    const token = req.headers.get('Authorization').split(' ')[1];
-    const payload = await this.jwt.verifyAsync(token, {
-      secret: this.config.get('REFRESH_JWT_SECRET'),
-    });
-    return await this.signToken(payload.sub, payload.email);
+  async refreshToken(token: { refresh_token: string }) {
+    try {
+      const { refresh_token } = token;
+      const payload = await this.jwt.verifyAsync(String(refresh_token), {
+        secret: this.config.get('REFRESH_JWT_SECRET'),
+      });
+      return await this.signToken(payload.sub, payload.email);
+    } catch (error) {
+      throw new BadRequestException('Invalid refresh token');
+    }
   }
 }

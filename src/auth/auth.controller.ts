@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Req } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { UserRegisterDto, CompanyRegisterDto, UserLoginDto } from './dto';
 import { AuthService } from './auth.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -40,11 +40,11 @@ export class AuthController {
     return this.authService.tpLogin(dto);
   }
 
-  @Get('token/refresh')
+  @Post('token/refresh')
   @ApiOperation({
     summary: 'Refresh token',
   })
-  async refreshToken(@Req() req) {
-    return this.authService.refreshToken(req);
+  async refreshToken(@Body() refresh_token) {
+    return this.authService.refreshToken(refresh_token);
   }
 }
