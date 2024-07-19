@@ -82,15 +82,35 @@ export class AuthService {
     if (!user) {
       throw new BadRequestException('Invalid email or password');
     }
+
     const isValid = await argon.verify(user.password, dto.password);
     if (!isValid) {
       throw new BadRequestException('Invalid email or password');
     }
     const token = await this.signToken(user.id, user.email);
+
+    if (user.firstTimeLogin) {
+      user.firstTimeLogin = false;
+      await this.database.user.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          firstTimeLogin: false,
+        },
+      });
+      return {
+        message: 'User login successfully',
+        role: UserRole.USER,
+        firstTimeLogin: true,
+        token,
+      };
+    }
     return {
       message: 'User login successfully',
       token,
       role: UserRole.USER,
+      firstTimeLogin: false,
     };
   }
 

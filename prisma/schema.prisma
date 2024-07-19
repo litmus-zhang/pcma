@@ -19,6 +19,7 @@ model User {
   firstname          String?
   lastname           String?
   password           String?
+  firstTimeLogin     Boolean                @default(true)
   pii                personal_id?
   transactionParties UserTransactionParty[]
   user_tp_request    user_tp_request[]
@@ -29,6 +30,7 @@ model TransactionParty {
   name            String
   email           String
   password        String
+  firstTimeLogin  Boolean                @default(true)
   users           UserTransactionParty[]
   user_tp_request user_tp_request[]
   application     application[]
