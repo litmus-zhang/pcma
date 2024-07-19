@@ -128,10 +128,28 @@ export class AuthService {
       throw new BadRequestException('Invalid email or password');
     }
     const token = await this.signToken(company.id, company.email);
+    if (company.firstTimeLogin) {
+      company.firstTimeLogin = false;
+      await this.database.transactionParty.update({
+        where: {
+          id: company.id,
+        },
+        data: {
+          firstTimeLogin: false,
+        },
+      });
+      return {
+        message: 'Company login successfully',
+        role: UserRole.TRANSACTION_PARTY,
+        firstTimeLogin: true,
+        token,
+      };
+    }
     return {
       message: 'Company login successfully',
       token,
       role: UserRole.TRANSACTION_PARTY,
+      firstTimeLogin: false,
     };
   }
 
