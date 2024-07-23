@@ -167,8 +167,7 @@ describe('PCMA (e2e) testing', () => {
             .expectStatus(201)
             .expectJsonLike({
               role: 'user',
-            })
-            .inspect();
+            });
         });
       });
     });
@@ -352,19 +351,30 @@ describe('PCMA (e2e) testing', () => {
       it('should return error if company is not authenticated', () => {
         return pactum.spec().get('/tp/profile').expectStatus(401);
       });
-      // it('should return company profile', () => {
-      //   return pactum
-      //     .spec()
-      //     .get('/tp/profile')
-      //     .withHeaders({ Authorization: 'Bearer $S{tpAt}' })
-      //     .expectStatus(200);
-      // });
+      it('should return company profile', () => {
+        return pactum
+          .spec()
+          .get('/tp/profile')
+          .withBearerToken('$S{tpAt}')
+          .expectStatus(200)
+          .inspect();
+        // .withHeaders({ Authorization: 'Bearer $S{tpAt}' })
+      });
     });
-    describe('Create an Application', () => {
+    describe('service provider Application', () => {
       it('should return error if company is not authenticated', () => {
         return pactum.spec().post('/tp/application').expectStatus(401);
       });
       // it('should create an application', () => {});
+      it('should return error if no body is provided', () => {});
+      it('should get all application', () => {
+        return pactum
+          .spec()
+          .get('/tp/application')
+          .withBearerToken('$S{tpAt}')
+          .expectStatus(200)
+          .expectBodyContains('Applications fetched successfully');
+      });
     });
   });
   describe('User-Transaction party interaction', () => {

@@ -127,7 +127,11 @@ export class AuthService {
     if (!isValid) {
       throw new BadRequestException('Invalid email or password');
     }
-    const token = await this.signToken(company.id, company.email);
+    const token = await this.signToken(
+      company.id,
+      company.email,
+      UserRole.TRANSACTION_PARTY,
+    );
     if (company.firstTimeLogin) {
       company.firstTimeLogin = false;
       await this.database.transactionParty.update({
@@ -156,8 +160,9 @@ export class AuthService {
   async signToken(
     userId: number,
     email: string,
+    role: UserRole = UserRole.USER,
   ): Promise<{ access_token: string; refresh_token: string }> {
-    const payload = { sub: userId, email };
+    const payload = { sub: userId, email, role };
     const access_token = await this.jwt.signAsync(payload, {
       expiresIn: '30m',
       secret: this.config.get('ACCESS_JWT_SECRET'),

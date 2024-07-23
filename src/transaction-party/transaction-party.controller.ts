@@ -8,8 +8,8 @@ import { CreateApplicationDto } from './dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 // import { ResponseStatus } from 'src/types/response.status';
 
-@UseGuards(JwtGuard)
 @ApiTags('Transaction Party/Service Provider')
+@UseGuards(JwtGuard)
 @Controller('tp')
 export class TransactionPartyController {
   constructor(
@@ -21,7 +21,6 @@ export class TransactionPartyController {
     summary: 'Get Service Provider profile details',
   })
   async getMe(@GetUser() transactionParty: TransactionParty) {
-    console.log('transactionParty', transactionParty);
     return transactionParty;
   }
   @Patch('profile')
