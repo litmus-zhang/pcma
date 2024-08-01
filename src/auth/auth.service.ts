@@ -27,7 +27,7 @@ export class AuthService {
     }
     const hash = await argon.hash(registerDto.password);
     try {
-      const user = await this.database.user.create({
+      await this.database.user.create({
         data: {
           email: registerDto.email,
           firstname: registerDto.firstName,
@@ -35,7 +35,7 @@ export class AuthService {
           password: hash,
         },
       });
-      await this.signToken(user.id, user.email);
+      // await this.signToken(user.id, user.email, UserRole.USER);
       return {
         message: 'User registered successfully',
       };
@@ -55,14 +55,18 @@ export class AuthService {
     }
     const hash = await argon.hash(registerDto.password);
     try {
-      const user = await this.database.transactionParty.create({
+      await this.database.transactionParty.create({
         data: {
           email: registerDto.email,
           name: registerDto.companyName,
           password: hash,
         },
       });
-      await this.signToken(user.id, user.email);
+      // await this.signToken(
+      //   company.id,
+      //   company.email,
+      //   UserRole.TRANSACTION_PARTY,
+      // );
       return {
         message: 'Company registered successfully',
       };
@@ -87,7 +91,7 @@ export class AuthService {
     if (!isValid) {
       throw new BadRequestException('Invalid email or password');
     }
-    const token = await this.signToken(user.id, user.email);
+    const token = await this.signToken(user.id, user.email, UserRole.USER);
 
     if (user.firstTimeLogin) {
       user.firstTimeLogin = false;
@@ -160,7 +164,7 @@ export class AuthService {
   async signToken(
     userId: number,
     email: string,
-    role: UserRole = UserRole.USER,
+    role: UserRole,
   ): Promise<{ access_token: string; refresh_token: string }> {
     const payload = { sub: userId, email, role };
     const access_token = await this.jwt.signAsync(payload, {
@@ -182,7 +186,8 @@ export class AuthService {
       const payload = await this.jwt.verifyAsync(String(refresh_token), {
         secret: this.config.get('REFRESH_JWT_SECRET'),
       });
-      return await this.signToken(payload.sub, payload.email);
+      console.log({ payload });
+      return await this.signToken(payload.sub, payload.email, payload.role);
     } catch (error) {
       throw new BadRequestException('Invalid refresh token');
     }

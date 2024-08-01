@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
@@ -24,29 +24,37 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     req: Request,
     payload: { sub: number; email: string; role: string },
   ) {
-    // check if payload.role is 'user' or 'transaction_party'
-    const isUserRequest = payload.role === 'user';
-    const isTransactionPartyRequest = payload.role === 'transaction_party';
-    if (isTransactionPartyRequest) {
-      // Handle transaction party logic
-      const transactionParty = await this.database.transactionParty.findUnique({
-        where: { id: payload.sub },
-      });
-      if (transactionParty) {
-        delete transactionParty.password;
-        return transactionParty;
+    try {
+      // check if payload.role is 'user' or 'transaction_party'
+      const isUserRequest = payload.role === 'user';
+      const isTransactionPartyRequest = payload.role === 'transaction_party';
+      if (isTransactionPartyRequest) {
+        // Handle transaction party logic
+        // console.log({ isTransactionPartyRequest });
+        const transactionParty =
+          await this.database.transactionParty.findUnique({
+            where: { id: payload.sub },
+          });
+        if (transactionParty) {
+          delete transactionParty.password;
+          return transactionParty;
+        }
       }
-    } else if (isUserRequest) {
-      // Handle user logic
-      const user = await this.database.user.findUnique({
-        where: { id: payload.sub },
-      });
-      if (!user) return null;
-      delete user.password;
-      return user;
-    }
+      if (isUserRequest) {
+        // Handle user logic
+        // console.log({ isUserRequest });
+        const user = await this.database.user.findUnique({
+          where: { id: payload.sub },
+        });
+        if (!user) return null;
+        delete user.password;
+        return user;
+      }
 
-    // If neither, you might want to handle it differently or return null
-    return null;
+      // If neither, you might want to handle it differently or return null
+      return null;
+    } catch (error) {
+      return new BadRequestException(error.message);
+    }
   }
 }
