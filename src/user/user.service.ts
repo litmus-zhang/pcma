@@ -90,7 +90,27 @@ export class UserService {
           id: userId,
         },
       });
+      const checkIfPIIIsSet = await Promise.allSettled([
+        this.database.basic_pii.findUnique({
+          where: {
+            user_id: userId,
+          },
+        }),
+        this.database.secret_pii.findUnique({
+          where: {
+            user_id: userId,
+          },
+        }),
+      ]);
+
       const result = await this.sortDashboardData(data);
+      if (checkIfPIIIsSet[0] && checkIfPIIIsSet[1]) {
+        result['basic_pii'] = 'Basic PII Not Set';
+        result['secret_pii'] = 'Secret PII Not Set';
+      } else {
+        result['basic_pii'] = 'Basic PII is Set';
+        result['secret_pii'] = 'Secret PII is Set';
+      }
       return {
         message: 'User dashboard data fetched successfully',
         data: result,
@@ -103,7 +123,7 @@ export class UserService {
       };
     }
   }
-  async sortDashboardData(data: any): Promise<any> {
+  async sortDashboardData(data: any): Promise<object> {
     // get all request count by type
     // get all request count by status
     // get all request
