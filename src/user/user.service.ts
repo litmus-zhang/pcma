@@ -105,11 +105,11 @@ export class UserService {
 
       const result = await this.sortDashboardData(data);
       if (checkIfPIIIsSet[0] && checkIfPIIIsSet[1]) {
-        result['basic_pii'] = 'Basic PII Not Set';
-        result['secret_pii'] = 'Secret PII Not Set';
+        result['basic_pii_saved'] = false;
+        result['secret_pii_saved'] = false;
       } else {
-        result['basic_pii'] = 'Basic PII is Set';
-        result['secret_pii'] = 'Secret PII is Set';
+        result['basic_pii_saved'] = true;
+        result['secret_pii_saved'] = true;
       }
       return {
         message: 'User dashboard data fetched successfully',
