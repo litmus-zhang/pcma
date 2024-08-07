@@ -382,7 +382,16 @@ describe('PCMA (e2e) testing', () => {
           .withBearerToken('$S{tpAt}')
           .withBody(createApp)
           .expectStatus(201)
-          .inspect();
+          .expectJsonLike({
+            data: {
+              secret_key: /.+/,
+              public_key: /.+/,
+              id: /.+/,
+            },
+            message: 'Application created successfully',
+            status: 201,
+          })
+          .stores('appId', 'data.id');
       });
       it('should return error if no body is provided', () => {
         return pactum

@@ -2,7 +2,8 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import { CompanyRegisterDto } from '../auth/dto';
 import { DatabaseService } from '../database/database.service';
 import { ResponseStatus } from '../types/response.status';
-import { generateKeyPair } from 'crypto';
+import { createHash } from 'crypto';
+import { ulid } from 'ulid';
 
 @Injectable()
 export class TransactionPartyService {
@@ -32,18 +33,24 @@ export class TransactionPartyService {
 
   async createApplication(transactionPartyId, dto): Promise<ResponseStatus> {
     try {
-      const keyPair = await this.generateKeyPairAsync();
+      const id = ulid();
+      const { secretKey, publicKey } = await this.generateKeyPairAsync();
       const result = await this.database.application.create({
         data: {
+          id,
           ...dto,
           createdBy: transactionPartyId,
-          public_key: keyPair.publicKey,
-          secret_key: keyPair.privateKey,
+          public_key: publicKey,
+          secret_key: secretKey,
         },
         select: {
           secret_key: true,
+          public_key: true,
+          id: true,
         },
       });
+      // use the ulid to generate the scret key anb public key
+      // return the secret key , public key and application id to the user
       return {
         message: 'Application created successfully',
         data: result,
@@ -84,32 +91,20 @@ export class TransactionPartyService {
     }
   }
 
-  async generateKeyPairAsync(): Promise<{
+  async generateKeyPairAsync(applicationId?: string): Promise<{
+    secretKey: string;
     publicKey: string;
-    privateKey: string;
   }> {
-    return new Promise((resolve, reject) => {
-      generateKeyPair(
-        'rsa',
-        {
-          modulusLength: 4096,
-          publicKeyEncoding: {
-            type: 'spki',
-            format: 'pem',
-          },
-          privateKeyEncoding: {
-            type: 'pkcs8',
-            format: 'pem',
-          },
-        },
-        (err, publicKey, privateKey) => {
-          if (err) {
-            return reject(err);
-          }
-          resolve({ publicKey, privateKey });
-        },
-      );
-    });
+    const secretKey = createHash('sha256')
+      .update(applicationId + 'secret')
+      .digest('hex');
+    const publicKey = createHash('sha256')
+      .update(applicationId + 'private')
+      .digest('hex');
+    return {
+      secretKey,
+      publicKey,
+    };
   }
 
   async getApplications(transactionPartyId: number): Promise<ResponseStatus> {
