@@ -90,6 +90,20 @@ export class UserService {
           id: userId,
         },
       });
+      // get the application the users have signed up to
+      const userApplications = await this.database.user.findUnique({
+        where: { id: userId },
+        select: {
+          userApplications: true,
+        },
+        // include: {
+        //   userApplications: {
+        //     include: {
+        //       application: true,
+        //     },
+        //   },
+        // },
+      });
       const checkIfPIIIsSet = await Promise.allSettled([
         this.database.basic_pii.findUnique({
           where: {
@@ -111,6 +125,7 @@ export class UserService {
         result['basic_pii_saved'] = true;
         result['secret_pii_saved'] = true;
       }
+      result['connected_applications'] = userApplications['userApplications'];
       return {
         message: 'User dashboard data fetched successfully',
         data: result,

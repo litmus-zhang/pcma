@@ -13,6 +13,7 @@ import {
   UserRegisterDto,
 } from 'src/auth/dto';
 import { UserBasicPiiDto, UserSensitivePiiDto } from 'src/user/dto';
+import { CreateApplicationDto } from 'src/transaction-party/dto';
 
 describe('PCMA (e2e) testing', () => {
   let app: INestApplication;
@@ -339,6 +340,9 @@ describe('PCMA (e2e) testing', () => {
                 total: 0,
                 data: [],
               },
+              secret_pii_saved: false,
+              basic_pii_saved: false,
+              connected_applications: [],
             },
             message: 'User dashboard data fetched successfully',
             status: 200,
@@ -362,11 +366,32 @@ describe('PCMA (e2e) testing', () => {
       });
     });
     describe('service provider Application', () => {
+      const createApp: CreateApplicationDto = {
+        name: 'Sample App',
+        website_url: 'www.google.com',
+        logo_url: 'https://google.com/logo.png',
+        data_access: ['basic_pii', 'secret_pii'],
+      };
       it('should return error if company is not authenticated', () => {
-        return pactum.spec().post('/tp/application').expectStatus(401);
+        return pactum.spec().get('/tp/application').expectStatus(401);
       });
-      // it('should create an application', () => {});
-      it('should return error if no body is provided', () => {});
+      it('should create an application', () => {
+        return pactum
+          .spec()
+          .post('/tp/application')
+          .withBearerToken('$S{tpAt}')
+          .withBody(createApp)
+          .expectStatus(201)
+          .inspect();
+      });
+      it('should return error if no body is provided', () => {
+        return pactum
+          .spec()
+          .post('/tp/application')
+          .withBearerToken('$S{tpAt}')
+          .expectStatus(400)
+          .inspect();
+      });
       it('should get all application', () => {
         return pactum
           .spec()

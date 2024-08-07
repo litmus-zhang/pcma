@@ -23,6 +23,7 @@ model User {
   pii                personal_id?
   transactionParties UserTransactionParty[]
   user_tp_request    user_tp_request[]
+  userApplications  UserApplication[]
 }
 
 model TransactionParty {
@@ -84,8 +85,8 @@ model user_tp_request {
   transactionParty   TransactionParty @relation(fields: [transactionPartyId], references: [id])
   status             String           @default("pending")
   activity           String?
-  createdAt          DateTime
-  updatedAt          DateTime
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @default(now())
 }
 
 model application {
@@ -95,9 +96,20 @@ model application {
   logo_url         String
   createdBy        Int
   transactionParty TransactionParty @relation(fields: [createdBy], references: [id])
-  createdAt        DateTime
-  updatedAt        DateTime
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @default(now())
   data_access      String[]
   secret_key       String
   public_key       String
+  userApplications  UserApplication[]
+}
+
+model UserApplication {
+  id              Int          @id @default(autoincrement())
+  userId          Int
+  applicationId   Int
+  user            User         @relation(fields: [userId], references: [id])
+  application     application  @relation(fields: [applicationId], references: [id])
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @default(now())
 }

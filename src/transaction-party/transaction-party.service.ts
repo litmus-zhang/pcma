@@ -38,7 +38,10 @@ export class TransactionPartyService {
           ...dto,
           createdBy: transactionPartyId,
           public_key: keyPair.publicKey,
-          private_key: keyPair.privateKey,
+          secret_key: keyPair.privateKey,
+        },
+        select: {
+          secret_key: true,
         },
       });
       return {
