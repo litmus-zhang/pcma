@@ -33,6 +33,17 @@ export class TransactionPartyService {
 
   async createApplication(transactionPartyId, dto): Promise<ResponseStatus> {
     try {
+      const application = await this.database.application.findFirst({
+        where: {
+          name: dto.name,
+        },
+      });
+      if (application) {
+        return {
+          message: 'Application name already exists, use another name',
+          status: HttpStatus.BAD_REQUEST,
+        };
+      }
       const id = ulid();
       const { secretKey, publicKey } = await this.generateKeyPairAsync();
       const result = await this.database.application.create({
