@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, UseGuards } from '@nestjs/common';
 import { TransactionPartyService } from './transaction-party.service';
 import { GetUser } from '../auth/decorators';
 import { TransactionParty } from '@prisma/client';
@@ -60,5 +60,13 @@ export class TransactionPartyController {
   })
   async getApplications(@GetUser('id') transactionPartyId: number) {
     return this.transactionPartyService.getApplications(transactionPartyId);
+  }
+
+  @Get('application/:applicationId')
+  @ApiOperation({
+    summary: "Get an application by it's id",
+  })
+  async getApplicationById(@Param("applicationId")  applicationId:string,@GetUser('id') transactionPartyId: number) {
+    return this.transactionPartyService.getApplicationById(applicationId,transactionPartyId);
   }
 }

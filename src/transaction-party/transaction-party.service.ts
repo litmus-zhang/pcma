@@ -44,6 +44,7 @@ export class TransactionPartyService {
           status: HttpStatus.BAD_REQUEST,
         };
       }
+
       const id = ulid();
       const { secretKey, publicKey } = await this.generateKeyPairAsync();
       const result = await this.database.application.create({
@@ -58,8 +59,15 @@ export class TransactionPartyService {
           secret_key: true,
           public_key: true,
           id: true,
+          data_access: true,
+          website_url: true,
+          logo_url:true,
+          name:true,
         },
       });
+
+
+      // console.log({result})
       // use the ulid to generate the scret key anb public key
       // return the secret key , public key and application id to the user
       return {
@@ -135,6 +143,40 @@ export class TransactionPartyService {
       });
       return {
         message: 'Applications fetched successfully',
+        data: result,
+        status: HttpStatus.OK,
+      };
+    } catch (error) {
+      return {
+        message: error.message,
+        status: HttpStatus.BAD_REQUEST,
+      };
+    }
+  }
+  async getApplicationById(applicationId:string,transactionPartyId:number): Promise<ResponseStatus> {
+    try {
+
+      console.log({applicationId,transactionPartyId})
+      // const result  = {}
+      const result = await this.database.application.findUnique({
+        where: {
+          id: applicationId,
+          createdBy:transactionPartyId
+        },
+        select: {
+          secret_key: true,
+          public_key: true,
+          id: true,
+          data_access: true,
+          website_url: true,
+          logo_url:true,
+          name:true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      });
+      return {
+        message: 'Application fetched successfully',
         data: result,
         status: HttpStatus.OK,
       };
