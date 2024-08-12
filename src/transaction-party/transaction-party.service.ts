@@ -5,6 +5,7 @@ import { ResponseStatus } from '../types/response.status';
 import { createHash } from 'crypto';
 import { ulid } from 'ulid';
 import { Prisma } from '@prisma/client';
+import { UpdateApplicationDto } from './dto';
 
 @Injectable()
 export class TransactionPartyService {
@@ -186,7 +187,7 @@ export class TransactionPartyService {
     }
   }
 
-  async updateApplicationById(applicationId:string,transactionPartyId:number,applicationUpdateDto:Prisma.applicationUpdateInput): Promise<ResponseStatus> {
+  async updateApplicationById(applicationId:string,transactionPartyId:number,applicationUpdateDto:UpdateApplicationDto): Promise<ResponseStatus> {
     try {
 
       // console.log({applicationId,transactionPartyId})
@@ -213,7 +214,7 @@ export class TransactionPartyService {
       });
 
 
-      
+
       return {
         message: 'Application updated successfully',
         data: result,

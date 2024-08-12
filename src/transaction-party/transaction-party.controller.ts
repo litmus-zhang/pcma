@@ -4,7 +4,7 @@ import { GetUser } from '../auth/decorators';
 import { Prisma, TransactionParty } from '@prisma/client';
 import { CompanyRegisterDto } from '../auth/dto';
 import { JwtGuard } from '../auth/guards';
-import { CreateApplicationDto } from './dto';
+import { CreateApplicationDto, UpdateApplicationDto } from './dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 // import { ResponseStatus } from 'src/types/response.status';
 
@@ -74,7 +74,7 @@ export class TransactionPartyController {
   @ApiOperation({
     summary: "Update an application by it's id",
   })
-  async updateApplicationById(@Param("applicationId")  applicationId:string,@GetUser('id') transactionPartyId: number,@Body() applicationUpdateDto:Prisma.applicationUpdateInput) {
+  async updateApplicationById(@Param("applicationId")  applicationId:string,@GetUser('id') transactionPartyId: number,@Body() applicationUpdateDto:UpdateApplicationDto) {
     return this.transactionPartyService.updateApplicationById(applicationId,transactionPartyId,applicationUpdateDto);
   }
 }
