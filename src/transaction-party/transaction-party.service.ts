@@ -139,6 +139,7 @@ export class TransactionPartyService {
           name: true,
           logo_url: true,
           website_url: true,
+          data_access: true,
           createdAt: true,
           updatedAt: true,
         },

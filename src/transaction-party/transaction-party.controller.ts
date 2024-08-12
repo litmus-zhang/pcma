@@ -20,8 +20,12 @@ export class TransactionPartyController {
   @ApiOperation({
     summary: 'Get Service Provider profile details',
   })
-  async getMe(@GetUser('tp') transactionParty: TransactionParty) {
-    return transactionParty;
+  async getMe(@GetUser() transactionParty: TransactionParty) {
+    return {
+      // message: 'Service Provider profile details',
+      data: transactionParty,
+      status: 200,
+    };
   }
   @Patch('profile')
   @ApiOperation({
