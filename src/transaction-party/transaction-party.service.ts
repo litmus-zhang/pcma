@@ -4,6 +4,7 @@ import { DatabaseService } from '../database/database.service';
 import { ResponseStatus } from '../types/response.status';
 import { createHash } from 'crypto';
 import { ulid } from 'ulid';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class TransactionPartyService {
@@ -155,9 +156,6 @@ export class TransactionPartyService {
   }
   async getApplicationById(applicationId:string,transactionPartyId:number): Promise<ResponseStatus> {
     try {
-
-      console.log({applicationId,transactionPartyId})
-      // const result  = {}
       const result = await this.database.application.findUnique({
         where: {
           id: applicationId,
@@ -177,6 +175,47 @@ export class TransactionPartyService {
       });
       return {
         message: 'Application fetched successfully',
+        data: result,
+        status: HttpStatus.OK,
+      };
+    } catch (error) {
+      return {
+        message: error.message,
+        status: HttpStatus.BAD_REQUEST,
+      };
+    }
+  }
+
+  async updateApplicationById(applicationId:string,transactionPartyId:number,applicationUpdateDto:Prisma.applicationUpdateInput): Promise<ResponseStatus> {
+    try {
+
+      // console.log({applicationId,transactionPartyId})
+      // const result  = {}
+      const result = await this.database.application.update({
+        where: {
+          id: applicationId,
+          createdBy:transactionPartyId
+        },
+        select: {
+          secret_key: true,
+          public_key: true,
+          id: true,
+          data_access: true,
+          website_url: true,
+          logo_url:true,
+          name:true,
+          createdAt: true,
+          updatedAt: true,
+        },
+        data:{
+          ...applicationUpdateDto
+        }
+      });
+
+
+      
+      return {
+        message: 'Application updated successfully',
         data: result,
         status: HttpStatus.OK,
       };
