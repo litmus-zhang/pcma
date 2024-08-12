@@ -20,7 +20,7 @@ export class TransactionPartyController {
   @ApiOperation({
     summary: 'Get Service Provider profile details',
   })
-  async getMe(@GetUser() transactionParty: TransactionParty) {
+  async getMe(@GetUser('tp') transactionParty: TransactionParty) {
     return transactionParty;
   }
   @Patch('profile')
