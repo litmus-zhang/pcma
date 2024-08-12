@@ -1,10 +1,10 @@
-import { Body, Controller, Get, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, UseGuards } from '@nestjs/common';
 import { TransactionPartyService } from './transaction-party.service';
 import { GetUser } from '../auth/decorators';
-import { TransactionParty } from '@prisma/client';
+import { Prisma, TransactionParty } from '@prisma/client';
 import { CompanyRegisterDto } from '../auth/dto';
 import { JwtGuard } from '../auth/guards';
-import { CreateApplicationDto } from './dto';
+import { CreateApplicationDto, UpdateApplicationDto } from './dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 // import { ResponseStatus } from 'src/types/response.status';
 
@@ -21,7 +21,11 @@ export class TransactionPartyController {
     summary: 'Get Service Provider profile details',
   })
   async getMe(@GetUser() transactionParty: TransactionParty) {
-    return transactionParty;
+    return {
+      // message: 'Service Provider profile details',
+      data: transactionParty,
+      status: 200,
+    };
   }
   @Patch('profile')
   @ApiOperation({
@@ -60,5 +64,21 @@ export class TransactionPartyController {
   })
   async getApplications(@GetUser('id') transactionPartyId: number) {
     return this.transactionPartyService.getApplications(transactionPartyId);
+  }
+
+  @Get('application/:applicationId')
+  @ApiOperation({
+    summary: "Get an application by it's id",
+  })
+  async getApplicationById(@Param("applicationId")  applicationId:string,@GetUser('id') transactionPartyId: number) {
+    return this.transactionPartyService.getApplicationById(applicationId,transactionPartyId);
+  }
+
+  @Patch('application/:applicationId')
+  @ApiOperation({
+    summary: "Update an application by it's id",
+  })
+  async updateApplicationById(@Param("applicationId")  applicationId:string,@GetUser('id') transactionPartyId: number,@Body() applicationUpdateDto:UpdateApplicationDto) {
+    return this.transactionPartyService.updateApplicationById(applicationId,transactionPartyId,applicationUpdateDto);
   }
 }
