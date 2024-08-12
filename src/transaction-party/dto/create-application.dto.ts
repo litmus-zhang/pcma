@@ -16,7 +16,7 @@ export class CreateApplicationDto {
 
   @IsOptional()
   @ApiProperty()
-  purpose_of_access?: string;
+  purpose_of_access?: string ;
 
   @IsNotEmpty()
   @ApiProperty()
