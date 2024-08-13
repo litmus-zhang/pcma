@@ -1,8 +1,9 @@
 import { Novu } from '@novu/node';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Global, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { CreateEmailOptions, Resend } from 'resend';
+// import { Resend } from 'resend';
 
+@Global()
 @Injectable()
 export class NotificationService {
   private readonly novu: Novu;
@@ -39,14 +40,26 @@ export class NotificationService {
     content: string,
   ) {
     try {
-      const resend = new Resend(this.config.get('RESEND_API_KEY'));
-      const emailData: CreateEmailOptions = {
-        to,
+      // const resend = new Resend(this.config.get('RESEND_API_KEY'));
+      // const { data, error } = await resend.emails.send({
+      //   from: 'John Doe <joe@pcma.com>',
+      //   to: to,
+      //   subject: subject,
+      //   html: content,
+      // });
+
+      // if (error) {
+      //   return console.error({ error });
+      // }
+      console.log({
         subject,
-        from: 'joe@pcma.com',
-        text: content,
+        to,
+        content,
+      });
+
+      return {
+        message: 'Email sent successfully',
       };
-      await resend.emails.send(emailData);
     } catch (error) {
       throw new BadRequestException(error.message);
     }

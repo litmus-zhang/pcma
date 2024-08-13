@@ -14,6 +14,7 @@ import {
 } from 'src/auth/dto';
 import { UserBasicPiiDto, UserSensitivePiiDto } from 'src/user/dto';
 import { CreateApplicationDto } from 'src/transaction-party/dto';
+import { NotificationService } from '../src/notification/notification.service';
 
 describe('PCMA (e2e) testing', () => {
   let app: INestApplication;
@@ -22,7 +23,12 @@ describe('PCMA (e2e) testing', () => {
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
-    }).compile();
+    })
+      .overrideProvider(NotificationService)
+      .useValue({
+        sendEmailNotificationWithResend: jest.fn(),
+      })
+      .compile();
 
     app = moduleFixture.createNestApplication();
     app.useGlobalPipes(
