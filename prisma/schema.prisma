@@ -34,7 +34,12 @@ model TransactionParty {
   firstTimeLogin  Boolean                @default(true)
   users           UserTransactionParty[]
   user_tp_request user_tp_request[]
-  application     application[]
+  applications     application[]
+  phoneNumber     String?
+  companyAddress  String?
+  registrationNumber  String?
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @default(now()) 
 }
 
 model UserTransactionParty {
@@ -99,6 +104,7 @@ model application {
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @default(now())
   data_access      String[]
+  purpose_of_access  String?   
   secret_key       String
   public_key       String
   userApplications UserApplication[]

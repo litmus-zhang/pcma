@@ -59,6 +59,9 @@ export class AuthService {
         data: {
           email: registerDto.email,
           name: registerDto.companyName,
+          phoneNumber: registerDto.phoneNumber,
+          companyAddress: registerDto.companyAddress,
+          registrationNumber: registerDto.registrationNumber,
           password: hash,
         },
       });

@@ -14,6 +14,10 @@ export class CreateApplicationDto {
   @ApiProperty()
   logo_url?: string;
 
+  @IsOptional()
+  @ApiProperty()
+  purpose_of_access?: string ;
+
   @IsNotEmpty()
   @ApiProperty()
   data_access: string[];
