@@ -1,6 +1,7 @@
 import { Novu } from '@novu/node';
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { CreateEmailOptions, Resend } from 'resend';
 
 @Injectable()
 export class NotificationService {
@@ -17,7 +18,11 @@ export class NotificationService {
     }
   }
 
-  async sendEmailNotification(to: string, subject: string, content: string) {
+  async sendEmailNotificationWithNovu(
+    to: string,
+    subject: string,
+    content: string,
+  ) {
     const emailData = {
       to,
       subject,
@@ -27,5 +32,23 @@ export class NotificationService {
       this.config.get('EMAIL_WORKFLOW_IF'),
       emailData,
     );
+  }
+  async sendEmailNotificationWithResend(
+    to: string,
+    subject: string,
+    content: string,
+  ) {
+    try {
+      const resend = new Resend(this.config.get('RESEND_API_KEY'));
+      const emailData: CreateEmailOptions = {
+        to,
+        subject,
+        from: 'joe@pcma.com',
+        text: content,
+      };
+      await resend.emails.send(emailData);
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 }
