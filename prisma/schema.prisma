@@ -27,19 +27,19 @@ model User {
 }
 
 model TransactionParty {
-  id              Int                    @id @default(autoincrement())
-  name            String
-  email           String
-  password        String
-  firstTimeLogin  Boolean                @default(true)
-  users           UserTransactionParty[]
-  user_tp_request user_tp_request[]
-  applications     application[]
-  phoneNumber     String?
-  companyAddress  String?
-  registrationNumber  String?
-  createdAt       DateTime               @default(now())
-  updatedAt       DateTime               @default(now()) 
+  id                 Int                    @id @default(autoincrement())
+  name               String
+  email              String
+  password           String
+  firstTimeLogin     Boolean                @default(true)
+  users              UserTransactionParty[]
+  user_tp_request    user_tp_request[]
+  applications       application[]
+  phoneNumber        String?
+  companyAddress     String?
+  registrationNumber String?
+  createdAt          DateTime               @default(now())
+  updatedAt          DateTime               @default(now())
 }
 
 model UserTransactionParty {
@@ -95,19 +95,19 @@ model user_tp_request {
 }
 
 model application {
-  id               String            @id
-  name             String            @unique
-  website_url      String
-  logo_url         String
-  createdBy        Int
-  transactionParty TransactionParty  @relation(fields: [createdBy], references: [id])
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @default(now())
-  data_access      String[]
-  purpose_of_access  String?   
-  secret_key       String
-  public_key       String
-  userApplications UserApplication[]
+  id                String            @id
+  name              String            @unique
+  website_url       String
+  logo_url          String
+  createdBy         Int
+  transactionParty  TransactionParty  @relation(fields: [createdBy], references: [id])
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @default(now())
+  data_access       String[]
+  purpose_of_access String?
+  secret_key        String
+  public_key        String
+  userApplications  UserApplication[]
 }
 
 model UserApplication {

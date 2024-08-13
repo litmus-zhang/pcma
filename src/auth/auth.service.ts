@@ -10,6 +10,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as argon from 'argon2';
 import { UserRole } from '../types/response.status';
+import { NotificationService } from '../notification/notification.service';
 
 @Injectable()
 export class AuthService {
@@ -17,6 +18,7 @@ export class AuthService {
     private database: DatabaseService,
     private jwt: JwtService,
     private config: ConfigService,
+    private mailService: NotificationService,
   ) {}
   async userSignup(registerDto: UserRegisterDto) {
     const findUser = await this.database.user.findUnique({
@@ -36,6 +38,11 @@ export class AuthService {
         },
       });
       // await this.signToken(user.id, user.email, UserRole.USER);
+      await this.mailService.sendEmailNotificationWithResend(
+        registerDto.email,
+        'Welcome to PCMA',
+        'You have successfully registered on our platform',
+      );
       return {
         message: 'User registered successfully',
       };
@@ -65,11 +72,17 @@ export class AuthService {
           password: hash,
         },
       });
+
       // await this.signToken(
       //   company.id,
       //   company.email,
       //   UserRole.TRANSACTION_PARTY,
       // );
+      await this.mailService.sendEmailNotificationWithResend(
+        registerDto.email,
+        'Welcome to PCMA',
+        'You have successfully registered on our platform',
+      );
       return {
         message: 'Company registered successfully',
       };

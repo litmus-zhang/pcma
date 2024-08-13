@@ -63,11 +63,10 @@ export class TransactionPartyService {
           id: true,
           data_access: true,
           website_url: true,
-          logo_url:true,
-          name:true,
+          logo_url: true,
+          name: true,
         },
       });
-
 
       // console.log({result})
       // use the ulid to generate the scret key anb public key
@@ -156,12 +155,15 @@ export class TransactionPartyService {
       };
     }
   }
-  async getApplicationById(applicationId:string,transactionPartyId:number): Promise<ResponseStatus> {
+  async getApplicationById(
+    applicationId: string,
+    transactionPartyId: number,
+  ): Promise<ResponseStatus> {
     try {
       const result = await this.database.application.findUnique({
         where: {
           id: applicationId,
-          createdBy:transactionPartyId
+          createdBy: transactionPartyId,
         },
         select: {
           secret_key: true,
@@ -169,8 +171,8 @@ export class TransactionPartyService {
           id: true,
           data_access: true,
           website_url: true,
-          logo_url:true,
-          name:true,
+          logo_url: true,
+          name: true,
           createdAt: true,
           updatedAt: true,
         },
@@ -188,15 +190,18 @@ export class TransactionPartyService {
     }
   }
 
-  async updateApplicationById(applicationId:string,transactionPartyId:number,applicationUpdateDto:UpdateApplicationDto): Promise<ResponseStatus> {
+  async updateApplicationById(
+    applicationId: string,
+    transactionPartyId: number,
+    applicationUpdateDto: UpdateApplicationDto,
+  ): Promise<ResponseStatus> {
     try {
-
       // console.log({applicationId,transactionPartyId})
       // const result  = {}
       const result = await this.database.application.update({
         where: {
           id: applicationId,
-          createdBy:transactionPartyId
+          createdBy: transactionPartyId,
         },
         select: {
           secret_key: true,
@@ -204,17 +209,15 @@ export class TransactionPartyService {
           id: true,
           data_access: true,
           website_url: true,
-          logo_url:true,
-          name:true,
+          logo_url: true,
+          name: true,
           createdAt: true,
           updatedAt: true,
         },
-        data:{
-          ...applicationUpdateDto
-        }
+        data: {
+          ...applicationUpdateDto,
+        },
       });
-
-
 
       return {
         message: 'Application updated successfully',
